@@ -33,6 +33,7 @@ public class TrollController : MonoBehaviour
         WALK,
         ATTACK,
         DEATH,
+        Eating,
     }
 
     private float start_def = 5f;
@@ -62,6 +63,11 @@ public class TrollController : MonoBehaviour
     {
 
 
+        if (player.GetComponent<PlayerMovement>().isGrabbed)
+        {
+            state = State.Eating;
+        }
+
         switch (state)
         {
 
@@ -80,6 +86,12 @@ public class TrollController : MonoBehaviour
                 break;
             case State.DEATH:
                 break;
+            case State.Eating:
+                enemy.isStopped = true;
+                anim.SetBool("isWalking", false);
+                anim.SetTrigger("Idle");
+                state = State.DEATH;
+                break;
 
         }
     }
@@ -88,7 +100,8 @@ public class TrollController : MonoBehaviour
 
     private void HandleAttack()
     {
-        if ((Time.time - time_start) >= 5f){
+        if ((Time.time - time_start) >= 5f)
+        {
             anim.SetTrigger("Attack");
             state = State.IDLE;
             time_start = Time.time;
@@ -165,7 +178,7 @@ public class TrollController : MonoBehaviour
 
     private void checkAttack()
     {
-        if (( Vector3.Distance(cameraPlayer.transform.position, Catch1.transform.position) < distanceToAttack  || Vector3.Distance(cameraPlayer.transform.position, Catch2.transform.position) < distanceToAttack) && (Time.time - time_start) >= 5)
+        if ((Vector3.Distance(cameraPlayer.transform.position, Catch1.transform.position) < distanceToAttack || Vector3.Distance(cameraPlayer.transform.position, Catch2.transform.position) < distanceToAttack) && (Time.time - time_start) >= 5)
         {
             state = State.ATTACK;
         }
@@ -177,6 +190,9 @@ public class TrollController : MonoBehaviour
         {
             state = State.DEATH;
             anim.SetTrigger("Death");
+            Catch1.SetActive(false);
+            Catch2.SetActive(false);
+            cube.SetActive(false);
         }
 
     }
